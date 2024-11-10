@@ -6,13 +6,12 @@ use App\Models\Gadget;
 use App\Http\Requests\StoreGadgetRequest;
 use App\Http\Requests\UpdateGadgetRequest;
 use App\Http\Resources\GadgetResource;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
 
 class GadgetController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $model = Gadget::query()
@@ -31,63 +30,63 @@ class GadgetController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return Inertia::render('Gadgets/Create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreGadgetRequest $request)
     {
-        Gadget::create($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('gadgets', 'public');
+        }
+
+        Gadget::create($data);
 
         session()->flash('message', 'Successfully created a new gadget');
 
         return redirect(route('gadgets.index'));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Gadget $gadget)
-    {
-        return Inertia::render('Gadgets/Show', [
-            'gadget' => new GadgetResource($gadget),
-        ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Gadget $gadget)
-    {
-        return Inertia::render('Gadgets/Update', [
-            'gadget' => new GadgetResource($gadget),
-        ]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateGadgetRequest $request, Gadget $gadget)
-    {
-        $gadget->update($request->validated());
+{
+    // Log the incoming request data
+    Log::info('Incoming update request data:', $request->all());
 
-        session()->flash('message', 'Successfully updated gadget');
+    // Validate and capture the data
+    $data = $request->validated();
 
-        return redirect(route('gadgets.index', $request->query()));
+    // Log the validated data
+    Log::info('Validated data:', $data);
+
+    // Check if a new image is uploaded and handle accordingly
+    if ($request->hasFile('image')) {
+        // Store the new image and update the path
+        $data['image'] = $request->file('image')->store('gadgets', 'public');
+        Log::info('New image uploaded and stored at:', ['path' => $data['image']]);
+    } else {
+        // No new image uploaded, keep the existing image
+        Log::info('No new image uploaded, keeping the existing image.');
+        unset($data['image']); // Retain the existing image in the database
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // Update the gadget record with the validated data
+    $gadget->update($data);
+
+    Log::info('Gadget updated successfully:', ['gadget' => $gadget]);
+
+    // Return JSON response instead of a redirect
+    return response()->json([
+        'success' => true,
+        'message' => 'Gadget updated successfully.',
+        'gadget' => $gadget
+    ]);
+}
+
+
     public function destroy(Gadget $gadget)
     {
+        if ($gadget->image) {
+            Storage::disk('public')->delete($gadget->image);
+        }
+
         $gadget->delete();
 
         session()->flash('message', 'Successfully deleted gadget');

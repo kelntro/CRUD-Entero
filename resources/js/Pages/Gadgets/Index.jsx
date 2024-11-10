@@ -33,6 +33,14 @@ import { Separator } from "@/shadcn/ui/separator";
 import { useToast } from "@/shadcn/hooks/use-toast";
 import { Button } from "@/shadcn/ui/button";
 
+// Utility function to format price
+const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-PH', {
+        style: 'currency',
+        currency: 'PHP',
+    }).format(price);
+};
+
 export default function GadgetIndex({ auth, model, queryParams = null }) {
     queryParams = queryParams || {};
 
@@ -46,6 +54,13 @@ export default function GadgetIndex({ auth, model, queryParams = null }) {
         process: "",
         data: null,
     });
+
+    const refreshData = () => {
+        router.get(route("gadgets.index"), { ...queryParams }, {
+            preserveState: true,
+            replace: true,
+        });
+    };
 
     const onSearchSubmit = (e) => {
         e.preventDefault();
@@ -175,6 +190,9 @@ export default function GadgetIndex({ auth, model, queryParams = null }) {
                                 <table className="border-collapse table-auto w-full text-sm">
                                     <thead>
                                         <tr>
+                                            <th className="border-b dark:border-slate-600 font-medium p-4 text-slate-400 dark:text-slate-200 text-left">
+                                                Image
+                                            </th>
                                             <th
                                                 onClick={() => {
                                                     onLoading();
@@ -193,6 +211,9 @@ export default function GadgetIndex({ auth, model, queryParams = null }) {
                                             </th>
                                             <th className="border-b dark:border-slate-600 font-medium p-4 text-slate-400 dark:text-slate-200 text-left">
                                                 Description
+                                            </th>
+                                            <th className="border-b dark:border-slate-600 font-medium p-4 text-slate-400 dark:text-slate-200 text-left">
+                                                Price
                                             </th>
                                             <th className="border-b dark:border-slate-600 font-medium p-4 text-slate-400 dark:text-slate-200 text-left">
                                                 Created By
@@ -222,10 +243,16 @@ export default function GadgetIndex({ auth, model, queryParams = null }) {
                                         {model.data.map((item) => (
                                             <tr key={item.id}>
                                                 <td className="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
+                                                    <img src={`/storage/${item.image}`} alt={item.name} className="w-16 h-16 object-cover" />
+                                                </td>
+                                                <td className="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
                                                     {item.name}
                                                 </td>
                                                 <td className="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
                                                     {item.description}
+                                                </td>
+                                                <td className="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
+                                                    {formatPrice(item.price)}
                                                 </td>
                                                 <td className="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
                                                     {item.createdBy.name}
@@ -326,6 +353,7 @@ export default function GadgetIndex({ auth, model, queryParams = null }) {
                             <GadgetUpdate
                                 model={dialogConfig.data}
                                 onDialogConfig={onDialogConfig}
+                                refreshData={refreshData}
                                 params={queryParams}
                             />
                         ) : null}

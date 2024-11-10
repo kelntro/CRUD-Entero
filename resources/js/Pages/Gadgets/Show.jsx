@@ -1,7 +1,4 @@
-/**
- * Created by teachasgreywolf
- * Adapted for Gadgets
- */
+// Show.jsx
 
 import { Button } from "@/shadcn/ui/button";
 import { Label } from "@/shadcn/ui/label";
@@ -29,6 +26,26 @@ const GadgetShow = ({ model, onDialogConfig }) => {
                             {model.description}
                         </div>
                     </div>
+
+                    <div className="grid w-full max-w-sm gap-1.5">
+                        <Label className="dark:text-slate-300">Price</Label>
+
+                        <div className="text-lg font-semibold">
+                            {model.price}
+                        </div>
+                    </div>
+
+                    {model.image && (
+                        <div className="grid w-full max-w-sm gap-1.5">
+                            <Label className="dark:text-slate-300">Image</Label>
+
+                            <img
+                                src={`/storage/${model.image}`}
+                                alt={model.name}
+                                className="w-full h-auto rounded-md"
+                            />
+                        </div>
+                    )}
                 </div>
 
                 <div className="space-y-8 w-1/3">

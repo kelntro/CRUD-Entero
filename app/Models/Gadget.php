@@ -11,8 +11,10 @@ class Gadget extends Model
     use HasFactory;
 
     protected $fillable = [
+        'image',
         'name',
         'description',
+        'price',
         'created_by',
         // Add other fillable fields here
     ];

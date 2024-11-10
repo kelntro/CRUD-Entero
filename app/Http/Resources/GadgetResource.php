@@ -21,8 +21,10 @@ class GadgetResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'image' => $this->image,
             'name' => $this->name,
             'description' => $this->description,
+            'price' => $this->price,
             'createdBy' => $this->createdBy,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),

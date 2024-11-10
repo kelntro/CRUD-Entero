@@ -1,7 +1,4 @@
-/**
- * Created by teachasgreywolf
- * Adapted for Gadgets
- */
+// Create.jsx
 
 import { useForm, usePage } from "@inertiajs/react";
 import { Loader2 } from "lucide-react";
@@ -31,7 +28,9 @@ const GadgetCreate = ({ resourceName }) => {
     const { data, setData, post, processing, reset, errors } = useForm({
         name: "",
         description: "",
+        price: "",
         created_by: auth.user.id,
+        image: null, // Add this line
     });
 
     const submit = (e) => {
@@ -65,7 +64,6 @@ const GadgetCreate = ({ resourceName }) => {
 
                     <div className="grid gap-4 mb-7 pt-3">
                         <div className="">
-                            {/* prettier-ignore */}
                             <LabelEx htmlFor="name" required>Name</LabelEx>
 
                             <Input
@@ -94,15 +92,39 @@ const GadgetCreate = ({ resourceName }) => {
                                 className="mt-1 block w-full py-[0.5rem] px-[.75rem] border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm"
                             />
                         </div>
+
+                        <div className="">
+                            <LabelEx htmlFor="price" required>Price</LabelEx>
+
+                            <Input
+                                value={data.price}
+                                onChange={(e) => setData("price", e.target.value)}
+                                type="number"
+                                step="0.01"
+                                className="mt-1 block w-full py-[0.5rem] px-[.75rem] border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm"
+                            />
+
+                            <InputError message={errors.price} className="mt-2" />
+                        </div>
+
+                        <div className="">
+                            <LabelEx htmlFor="image">Image</LabelEx>
+
+                            <Input
+                                onChange={(e) => setData("image", e.target.files[0])}
+                                type="file"
+                                className="mt-1 block w-full py-[0.5rem] px-[.75rem] border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm"
+                            />
+
+                            <InputError message={errors.image} className="mt-2" />
+                        </div>
                     </div>
 
-                    {/* prettier-ignore */}
                     <DialogFooter>
                         {processing
                             ? (
                                 <Button disabled className="rounded-full w-40">
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-
                                     Creating...
                                 </Button>
                             )

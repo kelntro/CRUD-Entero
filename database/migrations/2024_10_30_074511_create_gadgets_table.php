@@ -13,12 +13,11 @@ return new class extends Migration
     {
         Schema::create('gadgets', function (Blueprint $table) {
             $table->id();
+            $table->string('image')->nullable();
             $table->string('name')->unique();
-
             $table->text('description')->nullable();
-            
+            $table->decimal('price', 8, 2);
             $table->foreignId('created_by')->constrained('users');
-
             $table->timestamps();
         });
     }
