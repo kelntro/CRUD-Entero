@@ -7,6 +7,7 @@ import { Label } from "@/shadcn/ui/label";
 import { Textarea } from "@/shadcn/ui/textarea";
 import { useForm, usePage } from "@inertiajs/react";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/shadcn/hooks/use-toast"; // Import useToast
 
 const GadgetUpdate = ({ model, onDialogConfig, refreshData }) => {
     const { auth } = usePage().props;
@@ -17,6 +18,7 @@ const GadgetUpdate = ({ model, onDialogConfig, refreshData }) => {
         created_by: auth.user.id,
         image: model.image ?? null,
     });
+    const { toast } = useToast(); // Use useToast
 
     const fileInputRef = useRef(null);
 
@@ -66,6 +68,9 @@ const GadgetUpdate = ({ model, onDialogConfig, refreshData }) => {
                 data: null,
             });
             refreshData();
+            toast({
+                description: `${model.name} has been updated successfully.`,
+            });
         })
         .catch(error => {
             console.error("Form submission errors:", error.message);
@@ -83,7 +88,6 @@ const GadgetUpdate = ({ model, onDialogConfig, refreshData }) => {
             }
         });
     };
-    
 
     return (
         <>
@@ -95,9 +99,9 @@ const GadgetUpdate = ({ model, onDialogConfig, refreshData }) => {
                             value={data.name}
                             onChange={(e) => setData("name", e.target.value)}
                             type="text"
-                            className="mt-1 block w-full"
+                            className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-lg shadow-sm"
                         />
-                        <InputError message={errors.name} className="mt-2" />
+                        <InputError message={errors.name} className="mt-2 text-red-600" />
                     </div>
 
                     <div>
@@ -105,7 +109,7 @@ const GadgetUpdate = ({ model, onDialogConfig, refreshData }) => {
                         <Textarea
                             value={data.description}
                             onChange={(e) => setData("description", e.target.value)}
-                            className="mt-1 block w-full"
+                            className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-lg shadow-sm"
                         />
                     </div>
 
@@ -116,9 +120,9 @@ const GadgetUpdate = ({ model, onDialogConfig, refreshData }) => {
                             onChange={(e) => setData("price", e.target.value)}
                             type="number"
                             step="0.01"
-                            className="mt-1 block w-full"
+                            className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-lg shadow-sm"
                         />
-                        <InputError message={errors.price} className="mt-2" />
+                        <InputError message={errors.price} className="mt-2 text-red-600" />
                     </div>
 
                     <div>
@@ -147,20 +151,20 @@ const GadgetUpdate = ({ model, onDialogConfig, refreshData }) => {
                             className="mt-1 block w-full"
                             style={{ display: 'none' }}
                         />
-                        <InputError message={errors.image} className="mt-2" />
+                        <InputError message={errors.image} className="mt-2 text-red-600" />
                     </div>
                 </div>
 
                 <div className="flex justify-end space-x-3">
                     {processing ? (
-                        <Button disabled className="rounded-full w-40">
+                        <Button disabled className="rounded-lg w-40 bg-gray-400 text-white">
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             Updating...
                         </Button>
                     ) : (
                         <Button
                             type="submit"
-                            className="bg-blue-600 hover:bg-blue-500 rounded-full w-40"
+                            className="bg-green-600 hover:bg-green-500 rounded-lg w-40 text-white"
                         >
                             Save
                         </Button>
@@ -175,7 +179,7 @@ const GadgetUpdate = ({ model, onDialogConfig, refreshData }) => {
                                 data: null,
                             })
                         }
-                        className="rounded-full w-40"
+                        className="bg-gray-200 hover:bg-gray-300 rounded-lg w-40 text-black"
                     >
                         Close
                     </Button>

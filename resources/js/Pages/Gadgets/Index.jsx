@@ -1,8 +1,3 @@
-/**
- * teachasgreywolf
- * Adapted for Gadgets
- */
-
 import PaginationEx from "@/Components/PaginationEx";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import SearchInput from "@/Components/SearchInput";
@@ -44,7 +39,7 @@ const formatPrice = (price) => {
 export default function GadgetIndex({ auth, model, queryParams = null }) {
     queryParams = queryParams || {};
 
-    const resourceName = "gadget";
+    const resourceName = "gadgets";
     const { toast } = useToast();
     const { flash } = usePage().props;
     const [search, setSearch] = useState(queryParams.search || "");
@@ -241,7 +236,17 @@ export default function GadgetIndex({ auth, model, queryParams = null }) {
                                     </thead>
                                     <tbody className="bg-white dark:bg-slate-800">
                                         {model.data.map((item) => (
-                                            <tr key={item.id}>
+                                            <tr
+                                                key={item.id}
+                                                onClick={() => {
+                                                    setDialogConfig({
+                                                        open: true,
+                                                        process: "view",
+                                                        data: item,
+                                                    });
+                                                }}
+                                                className="cursor-pointer"
+                                            >
                                                 <td className="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
                                                     <img src={`/storage/${item.image}`} alt={item.name} className="w-16 h-16 object-cover" />
                                                 </td>
@@ -265,22 +270,8 @@ export default function GadgetIndex({ auth, model, queryParams = null }) {
                                                         <div className="text-center cursor-pointer hover:bg-slate-400 hover:text-black hover:rounded-xl p-1">
                                                             <div
                                                                 className="flex flex-col items-center text-[7px]"
-                                                                onClick={() => {
-                                                                    setDialogConfig({
-                                                                        open: true,
-                                                                        process: "view",
-                                                                        data: item,
-                                                                    });
-                                                                }}
-                                                            >
-                                                                <Eye className="border rounded-full px-1 text-blue-600 border-blue-600" />
-                                                                <span>View</span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="text-center cursor-pointer hover:bg-slate-400 hover:text-black hover:rounded-xl p-1">
-                                                            <div
-                                                                className="flex flex-col items-center text-[7px]"
-                                                                onClick={() => {
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
                                                                     setDialogConfig({
                                                                         open: true,
                                                                         process: "update",
@@ -295,7 +286,10 @@ export default function GadgetIndex({ auth, model, queryParams = null }) {
                                                         <div className="text-center cursor-pointer hover:bg-slate-400 hover:text-black hover:rounded-xl p-1">
                                                             <div
                                                                 className="flex flex-col items-center text-[7px]"
-                                                                onClick={() => handleDelete(item)}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleDelete(item);
+                                                                }}
                                                             >
                                                                 <Trash className="border rounded-full px-1 text-red-600 border-red-600" />
                                                                 <span>Delete</span>
@@ -320,45 +314,46 @@ export default function GadgetIndex({ auth, model, queryParams = null }) {
                 </div>
 
                 <Dialog open={dialogConfig.open} onOpenChange={onDialogConfig}>
-                    <DialogContent className="sm:max-w-[600px] dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg p-6">
-                        <DialogHeader>
-                            <DialogTitle className="text-xl font-semibold text-gray-700 dark:text-gray-200">
-                                {dialogConfig.process === "delete"
-                                    ? `Confirm Delete ${titleCase(resourceName)}`
-                                    : titleCase(`${dialogConfig.process} ${resourceName}`)}
-                            </DialogTitle>
-                        </DialogHeader>
-                        
-                        <Separator className="h-[1px] mb-4 bg-slate-500" />
-                        
-                        {dialogConfig.process === "delete" ? (
-                            <div className="text-center">
-                                <p className="mb-6 text-gray-600 dark:text-gray-300">
-                                    Are you sure you want to delete{" "}
-                                    <strong>{dialogConfig.data?.name}</strong>?
-                                </p>
-                                <Button
-                                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
-                                    onClick={confirmDelete}
-                                >
-                                    Confirm Delete
-                                </Button>
-                            </div>
-                        ) : dialogConfig.process === "view" ? (
-                            <GadgetShow
-                                model={dialogConfig.data}
-                                onDialogConfig={onDialogConfig}
-                            />
-                        ) : dialogConfig.process === "update" ? (
-                            <GadgetUpdate
-                                model={dialogConfig.data}
-                                onDialogConfig={onDialogConfig}
-                                refreshData={refreshData}
-                                params={queryParams}
-                            />
-                        ) : null}
-                    </DialogContent>
-                </Dialog>
+    <DialogContent className="sm:max-w-[600px] max-h-[80vh] p-8 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg">
+        <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-gray-700 dark:text-gray-200">
+                {dialogConfig.process === "delete"
+                    ? `Confirm Delete ${titleCase(resourceName)}`
+                    : titleCase(`${dialogConfig.process} ${resourceName}`)}
+            </DialogTitle>
+        </DialogHeader>
+        
+        <Separator className="h-[1px] mb-4 bg-slate-500" />
+        
+        {dialogConfig.process === "delete" ? (
+            <div className="text-center">
+                <p className="mb-6 text-gray-600 dark:text-gray-300">
+                    Are you sure you want to delete{" "}
+                    <strong>{dialogConfig.data?.name}</strong>?
+                </p>
+                <Button
+                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+                    onClick={confirmDelete}
+                >
+                    Confirm Delete
+                </Button>
+            </div>
+        ) : dialogConfig.process === "view" ? (
+            <GadgetShow
+                model={dialogConfig.data}
+                onDialogConfig={onDialogConfig}
+            />
+        ) : dialogConfig.process === "update" ? (
+            <GadgetUpdate
+                model={dialogConfig.data}
+                onDialogConfig={onDialogConfig}
+                refreshData={refreshData}
+                params={queryParams}
+            />
+        ) : null}
+    </DialogContent>
+</Dialog>
+
             </div>
         </AuthenticatedLayout>
     );

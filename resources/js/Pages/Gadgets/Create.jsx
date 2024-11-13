@@ -1,5 +1,3 @@
-// Create.jsx
-
 import { useForm, usePage } from "@inertiajs/react";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -7,6 +5,7 @@ import { titleCase } from "@/lib/util";
 import LabelEx from "@/Components/LabelEx";
 import InputError from "@/Components/InputError";
 import { Label } from "@/shadcn/ui/label";
+import { useToast } from "@/shadcn/hooks/use-toast"; // Import useToast
 
 import {
     Dialog,
@@ -30,8 +29,9 @@ const GadgetCreate = ({ resourceName }) => {
         description: "",
         price: "",
         created_by: auth.user.id,
-        image: null, // Add this line
+        image: null,
     });
+    const { toast } = useToast(); // Use useToast
 
     const submit = (e) => {
         e.preventDefault();
@@ -40,27 +40,30 @@ const GadgetCreate = ({ resourceName }) => {
             onSuccess: () => {
                 reset();
                 setOpen(false);
+                toast({
+                    description: `${titleCase(resourceName)} has been created successfully.`,
+                });
             },
         });
     };
 
     return (
-        <Dialog className="bg-slate-400" open={open} onOpenChange={setOpen}>
+        <Dialog className="bg-gray-100" open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="bg-blue-600 rounded-full hover:bg-blue-500 px-10">
+                <Button className="bg-green-600 rounded-lg hover:bg-green-500 px-8 py-2 text-white">
                     Create {titleCase(resourceName)}
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-[425px] dark:bg-gray-800 text-gray-900 dark:text-gray-100 dark:border-none">
+            <DialogContent className="sm:max-w-[500px] bg-white text-black border border-gray-300 rounded-lg shadow-lg">
                 <form onSubmit={submit}>
                     <DialogHeader>
-                        <DialogTitle>
+                        <DialogTitle className="text-xl font-semibold">
                             Create {titleCase(resourceName)}
                         </DialogTitle>
                     </DialogHeader>
 
-                    <Separator className="h-[1px] my-4 bg-slate-500" />
+                    <Separator className="h-[1px] my-4 bg-gray-300" />
 
                     <div className="grid gap-4 mb-7 pt-3">
                         <div className="">
@@ -72,12 +75,12 @@ const GadgetCreate = ({ resourceName }) => {
                                     setData("name", e.target.value)
                                 }
                                 type="text"
-                                className="mt-1 block w-full py-[0.5rem] px-[.75rem] border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm"
+                                className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-lg shadow-sm"
                             />
 
                             <InputError
                                 message={errors.name}
-                                className="mt-2"
+                                className="mt-2 text-red-600"
                             />
                         </div>
 
@@ -89,7 +92,7 @@ const GadgetCreate = ({ resourceName }) => {
                                 onChange={(e) =>
                                     setData("description", e.target.value)
                                 }
-                                className="mt-1 block w-full py-[0.5rem] px-[.75rem] border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm"
+                                className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-lg shadow-sm"
                             />
                         </div>
 
@@ -101,10 +104,10 @@ const GadgetCreate = ({ resourceName }) => {
                                 onChange={(e) => setData("price", e.target.value)}
                                 type="number"
                                 step="0.01"
-                                className="mt-1 block w-full py-[0.5rem] px-[.75rem] border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm"
+                                className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-lg shadow-sm"
                             />
 
-                            <InputError message={errors.price} className="mt-2" />
+                            <InputError message={errors.price} className="mt-2 text-red-600" />
                         </div>
 
                         <div className="">
@@ -113,17 +116,17 @@ const GadgetCreate = ({ resourceName }) => {
                             <Input
                                 onChange={(e) => setData("image", e.target.files[0])}
                                 type="file"
-                                className="mt-1 block w-full py-[0.5rem] px-[.75rem] border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm"
+                                className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-lg shadow-sm"
                             />
 
-                            <InputError message={errors.image} className="mt-2" />
+                            <InputError message={errors.image} className="mt-2 text-red-600" />
                         </div>
                     </div>
 
-                    <DialogFooter>
+                    <DialogFooter className="flex justify-end space-x-4">
                         {processing
                             ? (
-                                <Button disabled className="rounded-full w-40">
+                                <Button disabled className="rounded-lg w-32 bg-gray-400 text-white">
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                     Creating...
                                 </Button>
@@ -131,14 +134,14 @@ const GadgetCreate = ({ resourceName }) => {
                             : (
                                 <Button
                                     type="submit"
-                                    className="bg-blue-600 hover:bg-blue-500 rounded-full w-40"
+                                    className="bg-green-600 hover:bg-green-500 rounded-lg w-32 text-white"
                                 >
                                     Save
                                 </Button>
                             )}
 
                         <DialogClose asChild>
-                            <Button type="button" variant="secondary" className="rounded-full w-40">
+                            <Button type="button" variant="secondary" className="rounded-lg w-32 bg-gray-200 hover:bg-gray-300 text-black">
                                 Close
                             </Button>
                         </DialogClose>
